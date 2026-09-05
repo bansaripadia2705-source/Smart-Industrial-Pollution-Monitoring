@@ -1,0 +1,25 @@
+﻿# Node modules
+node_modules/
+npm-debug.log*
+
+# Environment secrets
+backend/.env
+.env
+.env.local
+
+# NeDB database files (auto-generated, not needed in repo)
+backend/data/*.db
+backend/data/ecoguard.db/
+
+# React build output
+frontend/build/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+backend_out.txt
+backend_err.txt

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EcoGuard AI – Backend API Dashboard</title>
+<style>
+  :root {
+    --bg:     #0d1117; --bg2: #161b22; --bg3: #21262d;
+    --border: #30363d; --text: #e6edf3; --muted: #8b949e;
+    --green:  #2da44e; --blue: #1f6feb; --red: #f85149;
+    --yellow: #d29922; --font: -apple-system,'Segoe UI',sans-serif;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:13px; }
+  header { background:var(--bg2); border-bottom:1px solid var(--border); padding:14px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+  header h1 { font-size:16px; color:var(--green); display:flex; align-items:center; gap:8px; }
+  .status-pill { display:flex; align-items:center; gap:6px; background:rgba(45,164,78,.15); border:1px solid rgba(45,164,78,.3); color:var(--green); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--green); animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .container { max-width:1200px; margin:0 auto; padding:24px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:20px; }
+  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+  .card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:18px; }
+  .card h3 { font-size:13px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px; }
+  .stat-val { font-size:32px; font-weight:800; line-height:1; }
+  .stat-lbl { font-size:11px; color:var(--muted); margin-top:4px; }
+  .green { color:var(--green); } .blue { color:var(--blue); } .red { color:var(--red); } .yellow { color:var(--yellow); }
+  .section-title { font-size:15px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--border); padding-bottom:10px; }
+  .route-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:6px; background:var(--bg3); margin-bottom:6px; cursor:pointer; transition:background .15s; border:1px solid transparent; }
+  .route-row:hover { border-color:var(--blue); }
+  .method { font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; min-width:44px; text-align:center; font-family:monospace; }
+  .get  { background:rgba(45,164,78,.2);  color:var(--green); }
+  .post { background:rgba(31,111,235,.2); color:var(--blue);  }
+  .patch{ background:rgba(210,153,34,.2); color:var(--yellow);}
+  .del  { background:rgba(248,81,73,.2);  color:var(--red);   }
+  .route-path { font-family:monospace; font-size:12px; color:var(--text); flex:1; }
+  .route-desc { font-size:11px; color:var(--muted); }
+  .test-btn { background:var(--blue); color:#fff; border:none; padding:3px 10px; border-radius:4px; font-size:11px; cursor:pointer; white-space:nowrap; }
+  .test-btn:hover { opacity:.85; }
+  pre { background:var(--bg3); border:1px solid var(--border); border-radius:6px; padding:12px; font-size:11px; overflow-x:auto; max-height:300px; overflow-y:auto; white-space:pre-wrap; word-break:break-all; color:#a5d6ff; line-height:1.5; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:600; }
+  .badge-green { background:rgba(45,164,78,.15);  color:var(--green); }
+  .badge-red   { background:rgba(248,81,73,.15);  color:var(--red);   }
+  .badge-blue  { background:rgba(31,111,235,.15); color:var(--blue);  }
+  .badge-yellow{ background:rgba(210,153,34,.15); color:var(--yellow);}
+  .log-line { padding:4px 0; border-bottom:1px solid var(--border); font-family:monospace; font-size:11px; display:flex; gap:10px; }
+  .log-200 { color:var(--green); } .log-304 { color:var(--blue); } .log-err { color:var(--red); }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--blue); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .tabs { display:flex; gap:4px; margin-bottom:16px; }
+  .tab { padding:6px 14px; border-radius:6px; background:var(--bg3); border:1px solid var(--border); color:var(--muted); cursor:pointer; font-size:12px; }
+  .tab.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .response-box { margin-top:10px; display:none; }
+  .response-box.show { display:block; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th { background:var(--bg3); padding:8px 12px; text-align:left; font-size:10px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); }
+  td { padding:8px 12px; border-bottom:1px solid var(--border); }
+  tr:last-child td { border:none; }
+  tr:hover { background:var(--bg3); }
+  .login-form { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .login-form input { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:7px 12px; border-radius:6px; font-size:12px; width:200px; }
+  .btn-primary { background:var(--green); color:#fff; border:none; padding:8px 16px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:600; }
+  .btn-primary:hover { opacity:.85; }
+  .copy-btn { background:var(--bg3); border:1px solid var(--border); color:var(--muted); padding:3px 8px; border-radius:4px; font-size:10px; cursor:pointer; }
+  .copy-btn:hover { color:var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 EcoGuard AI &nbsp;–&nbsp; Backend API Dashboard</h1>
+  <div style="display:flex;gap:12px;align-items:center">
+    <span id="serverStatus" class="status-pill"><span class="dot"></span> Checking...</span>
+    <span style="font-size:11px;color:var(--muted)">http://localhost:5000</span>
+    <button class="btn-primary" onclick="checkHealth()" style="padding:5px 12px;font-size:11px;">🔄 Refresh</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Health Stats -->
+  <div id="healthInfo" style="margin-bottom:20px;display:none">
+    <div class="grid4">
+      <div class="card" style="border-left:3px solid var(--green)">
+        <div class="stat-val green" id="srvStatus">OK</div>
+        <div class="stat-lbl">Server Status</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--blue)">
+        <div class="stat-val blue" id="srvVersion">1.0.0</div>
+        <div class="stat-lbl">Version</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--yellow)">
+        <div class="stat-val yellow" id="wxMode">–</div>
+        <div class="stat-lbl">WatsonX Mode</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--green)">
+        <div class="stat-val green" id="srvPort">5000</div>
+        <div class="stat-lbl">Port</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live DB Stats -->
+  <div style="margin-bottom:20px">
+    <div class="section-title">📊 Live Database Statistics</div>
+    <div class="grid4" id="dbStats">
+      <div class="card"><div style="color:var(--muted);font-size:12px">Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- Authentication -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-title">🔐 Authentication</div>
+    <div class="login-form">
+      <input type="email" id="loginEmail" value="admin@ecoguard.ai" placeholder="Email"/>
+      <input type="password" id="loginPass" value="Admin@123" placeholder="Password"/>
+      <button class="btn-primary" onclick="doLogin()">🔑 Login & Get Token</button>
+      <span id="loginResult" style="font-size:11px;color:var(--muted)"></span>
+    </div>
+    <div id="tokenBox" class="response-box">
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+        <span style="font-size:11px;color:var(--muted)">JWT Token:</span>
+        <button class="copy-btn" onclick="copyToken()">📋 Copy</button>
+        <span id="tokenUser" class="badge badge-green"></span>
+      </div>
+      <pre id="tokenVal" style="margin-top:6px;word-break:break-all;font-size:10px"></pre>
+    </div>
+  </div>
+
+  <!-- API Routes Explorer -->
+  <div style="margin-bottom:20px">
+    <div class="section-title">🛣️ API Routes Explorer</div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('all',this)">All Routes</button>
+      <button class="tab" onclick="switchTab('auth',this)">Auth</button>
+      <button class="tab" onclick="switchTab('dashboard',this)">Dashboard</button>
+      <button class="tab" onclick="switchTab('monitoring',this)">Monitoring</button>
+      <button class="tab" onclick="switchTab('compliance',this)">Compliance</button>
+      <button class="tab" onclick="switchTab('ai',this)">AI</button>
+    </div>
+    <div id="routeList"></div>
+    <div class="card" style="margin-top:12px;display:none" id="responsePanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:600" id="responseTitle">Response</span>
+        <div style="display:flex;gap:8px">
+          <span id="responseStatus" class="badge"></span>
+          <span id="responseTime" style="font-size:11px;color:var(--muted)"></span>
+          <button class="copy-btn" onclick="copyResponse()">📋 Copy</button>
+        </div>
+      </div>
+      <pre id="responseBody"></pre>
+    </div>
+  </div>
+
+  <!-- Live Request Log -->
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="section-title" style="margin-bottom:0;border:none;padding:0">📋 Request Log</div>
+      <button class="copy-btn" onclick="clearLog()">🗑 Clear</button>
+    </div>
+    <div id="requestLog" style="max-height:200px;overflow-y:auto;font-family:monospace;font-size:11px">
+      <div style="color:var(--muted);padding:8px">No requests yet — click a route above to test it.</div>
+    </div>
+  </div>
+
+  <!-- DB Collections Table -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-title">🗄️ Database Collections</div>
+    <table>
+      <thead><tr><th>Collection</th><th>Description</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="collTable">
+        <tr><td colspan="4" style="color:var(--muted)">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- IBM WatsonX Info -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-title">🤖 IBM WatsonX / Granite LLM</div>
+    <div class="grid3">
+      <div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">PROJECT ID</div>
+        <div style="font-family:monospace;font-size:11px;color:var(--yellow);word-break:break-all">29f2b75e-ec3e-463c-b6de-aefa520a2d81</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">MODEL</div>
+        <div style="font-family:monospace;font-size:11px;color:var(--blue)">ibm/granite-13b-instruct-v2</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">ENDPOINT</div>
+        <div style="font-family:monospace;font-size:10px;color:var(--muted);word-break:break-all">api.au-syd.watson-orchestrate.cloud.ibm.com</div>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn-primary" style="background:var(--blue)" onclick="testAI()">🤖 Test AI Query</button>
+      <span id="aiStatus" style="margin-left:10px;font-size:11px;color:var(--muted)"></span>
+      <pre id="aiResponse" style="margin-top:10px;display:none"></pre>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:11px;border-top:1px solid var(--border)">
+    EcoGuard AI · IBM Agentic AI Hackathon 2024 · Challenge 9 · Vapi–Ankleshwar–Vatva Corridor
+  </div>
+</div>
+
+<script>
+const BASE = 'http://localhost:5000';
+let TOKEN = localStorage.getItem('eco_token') || '';
+let logEntries = [];
+
+const ROUTES = [
+  { method:'GET',   path:'/api/health',                    desc:'Server health check',             tag:'all',        auth:false },
+  { method:'POST',  path:'/api/auth/login',                desc:'Login and get JWT token',         tag:'auth',       auth:false, body:{email:'admin@ecoguard.ai',password:'Admin@123'} },
+  { method:'GET',   path:'/api/auth/me',                   desc:'Get current user info',           tag:'auth',       auth:true  },
+  { method:'GET',   path:'/api/dashboard/stats',           desc:'KPI statistics overview',         tag:'dashboard',  auth:true  },
+  { method:'GET',   path:'/api/dashboard/chart-data',      desc:'24h chart data',                  tag:'dashboard',  auth:true  },
+  { method:'GET',   path:'/api/dashboard/recent-incidents',desc:'Recent violations',               tag:'dashboard',  auth:true  },
+  { method:'GET',   path:'/api/industries',                desc:'All industrial units',            tag:'monitoring', auth:true  },
+  { method:'GET',   path:'/api/sensors',                   desc:'All registered sensors',          tag:'monitoring', auth:true  },
+  { method:'GET',   path:'/api/sensors?type=air',          desc:'Air sensors only',                tag:'monitoring', auth:true  },
+  { method:'GET',   path:'/api/sensors?type=water',        desc:'Water sensors only',              tag:'monitoring', auth:true  },
+  { method:'GET',   path:'/api/readings?limit=5',          desc:'Latest sensor readings',          tag:'monitoring', auth:true  },
+  { method:'GET',   path:'/api/readings?type=air&limit=5', desc:'Latest air readings',             tag:'monitoring', auth:true  },
+  { method:'GET',   path:'/api/readings/live?type=air',    desc:'Live simulated air reading',      tag:'monitoring', auth:true  },
+  { method:'GET',   path:'/api/readings/live?type=water',  desc:'Live simulated water reading',    tag:'monitoring', auth:true  },
+  { method:'GET',   path:'/api/violations',                desc:'All violations',                  tag:'compliance', auth:true  },
+  { method:'GET',   path:'/api/violations/stats/summary',  desc:'Violation summary counts',        tag:'compliance', auth:true  },
+  { method:'GET',   path:'/api/alerts',                    desc:'All regulatory alerts',           tag:'compliance', auth:true  },
+  { method:'GET',   path:'/api/alerts?status=active',      desc:'Active alerts only',              tag:'compliance', auth:true  },
+  { method:'GET',   path:'/api/risk',                      desc:'All risk assessments',            tag:'compliance', auth:true  },
+  { method:'GET',   path:'/api/agents',                    desc:'All AI agent statuses',           tag:'ai',         auth:true  },
+  { method:'GET',   path:'/api/ai/reports',                desc:'All generated AI reports',        tag:'ai',         auth:true  },
+  { method:'POST',  path:'/api/ai/query',                  desc:'Ask AI a question',               tag:'ai',         auth:true,  body:{question:'What is the current air quality status in Vapi?'} },
+];
+
+const COLL_INFO = [
+  { name:'users',          desc:'Admin & inspector accounts' },
+  { name:'industries',     desc:'10 industrial units' },
+  { name:'sensors',        desc:'40 air & water sensors' },
+  { name:'readings',       desc:'Pollution readings (24h history)' },
+  { name:'violations',     desc:'Threshold exceedances' },
+  { name:'alerts',         desc:'Regulatory & compliance alerts' },
+  { name:'riskAssessments',desc:'Public health risk records' },
+  { name:'reports',        desc:'AI-generated compliance reports' },
+  { name:'agentActivities',desc:'AI agent activity log' },
+];
+
+let currentTab = 'all';
+let lastResponse = '';
+
+// ── Health Check ──────────────────────────────────────────────────────────────
+async function checkHealth() {
+  const el = document.getElementById('serverStatus');
+  el.innerHTML = '<span class="spinner"></span> Checking...';
+  try {
+    const r = await fetch(BASE + '/api/health');
+    const d = await r.json();
+    el.innerHTML = '<span class="dot"></span> Online ✓';
+    el.style.background = 'rgba(45,164,78,.15)';
+    el.style.color = '#2da44e';
+    document.getElementById('healthInfo').style.display = 'block';
+    document.getElementById('srvStatus').textContent  = d.status;
+    document.getElementById('srvVersion').textContent = d.version;
+    document.getElementById('wxMode').textContent     = d.watsonx?.mode?.toUpperCase() || 'MOCK';
+    loadDbStats();
+    loadCollTable();
+  } catch {
+    el.innerHTML = '⚠️ Offline';
+    el.style.background = 'rgba(248,81,73,.15)';
+    el.style.color = '#f85149';
+  }
+}
+
+// ── DB Stats ──────────────────────────────────────────────────────────────────
+async function loadDbStats() {
+  if (!TOKEN) return;
+  try {
+    const r = await fetch(BASE + '/api/dashboard/stats', { headers:{ Authorization:'Bearer '+TOKEN } });
+    const d = await r.json();
+    const s = d.data;
+    document.getElementById('dbStats').innerHTML = `
+      <div class="card" style="border-left:3px solid var(--blue)">
+        <div class="stat-val blue">${s.totalIndustries}</div><div class="stat-lbl">🏭 Industries</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--green)">
+        <div class="stat-val green">${s.activeSensors}</div><div class="stat-lbl">📡 Active Sensors</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--red)">
+        <div class="stat-val red">${s.activeViolations}</div><div class="stat-lbl">⚠️ Active Violations</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--yellow)">
+        <div class="stat-val yellow">${s.criticalAlerts}</div><div class="stat-lbl">🚨 Critical Alerts</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--green)">
+        <div class="stat-val green">${s.totalReadings}</div><div class="stat-lbl">📊 Total Readings</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--blue)">
+        <div class="stat-val blue">${s.avgComplianceScore}%</div><div class="stat-lbl">✅ Avg Compliance</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--yellow)">
+        <div class="stat-val yellow">${s.currentAQI}</div><div class="stat-lbl">💨 Current AQI</div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--red)">
+        <div class="stat-val red">${s.highRiskZones}</div><div class="stat-lbl">🏥 High Risk Zones</div>
+      </div>`;
+  } catch { }
+}
+
+function loadCollTable() {
+  document.getElementById('collTable').innerHTML = COLL_INFO.map(c => `
+    <tr>
+      <td><strong style="font-family:monospace;color:var(--blue)">${c.name}</strong></td>
+      <td style="color:var(--muted)">${c.desc}</td>
+      <td><span class="badge badge-green">● Active</span></td>
+      <td><button class="test-btn" onclick="testRoute('/api/${c.name==='users'?'auth/me':c.name}','GET')">View Data</button></td>
+    </tr>`).join('');
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const pass  = document.getElementById('loginPass').value;
+  const res   = document.getElementById('loginResult');
+  res.textContent = '⏳ Logging in...';
+  try {
+    const t0 = Date.now();
+    const r  = await fetch(BASE + '/api/auth/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, password: pass })
+    });
+    const d  = await r.json();
+    const ms = Date.now() - t0;
+    if (d.success) {
+      TOKEN = d.token;
+      localStorage.setItem('eco_token', TOKEN);
+      res.innerHTML = `<span style="color:var(--green)">✓ Logged in as <strong>${d.user.name}</strong> (${d.user.role}) · ${ms}ms</span>`;
+      document.getElementById('tokenVal').textContent  = TOKEN;
+      document.getElementById('tokenUser').textContent = d.user.role;
+      document.getElementById('tokenBox').classList.add('show');
+      addLog('POST', '/api/auth/login', 200, ms);
+      loadDbStats();
+      loadCollTable();
+    } else {
+      res.innerHTML = `<span style="color:var(--red)">✗ ${d.message}</span>`;
+    }
+  } catch (e) {
+    res.innerHTML = `<span style="color:var(--red)">✗ Cannot reach backend – is it running?</span>`;
+  }
+}
+
+function copyToken() {
+  navigator.clipboard.writeText(TOKEN);
+  document.querySelector('.copy-btn').textContent = '✓ Copied';
+  setTimeout(() => document.querySelectorAll('.copy-btn')[0].textContent = '📋 Copy', 2000);
+}
+
+// ── Routes ────────────────────────────────────────────────────────────────────
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderRoutes();
+}
+
+function renderRoutes() {
+  const list = document.getElementById('routeList');
+  const routes = ROUTES.filter(r => currentTab === 'all' || r.tag === currentTab || currentTab === 'monitoring' && r.tag === 'monitoring');
+  list.innerHTML = routes.map((r, i) => `
+    <div class="route-row" onclick="testRoute('${r.path}','${r.method}',${JSON.stringify(r.body||null)})">
+      <span class="method ${r.method.toLowerCase()}">${r.method}</span>
+      <span class="route-path">${r.path}</span>
+      <span class="route-desc">${r.desc}</span>
+      ${r.auth ? '<span class="badge badge-blue" style="font-size:9px">🔐 Auth</span>' : '<span class="badge badge-green" style="font-size:9px">Public</span>'}
+      <button class="test-btn">▶ Test</button>
+    </div>`).join('');
+}
+
+async function testRoute(path, method = 'GET', body = null) {
+  const panel = document.getElementById('responsePanel');
+  const pre   = document.getElementById('responseBody');
+  const title = document.getElementById('responseTitle');
+  const status= document.getElementById('responseStatus');
+  const time  = document.getElementById('responseTime');
+  panel.style.display = 'block';
+  pre.textContent = '⏳ Loading...';
+  title.textContent = `${method} ${path}`;
+  const t0 = Date.now();
+  try {
+    const opts = {
+      method,
+      headers: { 'Content-Type':'application/json' }
+    };
+    if (TOKEN) opts.headers['Authorization'] = 'Bearer ' + TOKEN;
+    if (body)  opts.body = JSON.stringify(body);
+    const r  = await fetch(BASE + path, opts);
+    const ms = Date.now() - t0;
+    let text;
+    try { text = JSON.stringify(await r.json(), null, 2); } catch { text = await r.text(); }
+    lastResponse = text;
+    pre.textContent = text;
+    status.textContent  = r.status + ' ' + r.statusText;
+    status.className    = 'badge ' + (r.ok ? 'badge-green' : 'badge-red');
+    time.textContent    = ms + 'ms';
+    panel.style.display = 'block';
+    addLog(method, path, r.status, ms);
+  } catch (e) {
+    pre.textContent = '✗ Error: ' + e.message + '\n\nMake sure the backend is running on http://localhost:5000';
+    status.textContent = 'Error'; status.className = 'badge badge-red';
+    addLog(method, path, 'ERR', Date.now() - t0);
+  }
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function copyResponse() { navigator.clipboard.writeText(lastResponse); }
+
+// ── AI Test ───────────────────────────────────────────────────────────────────
+async function testAI() {
+  const status = document.getElementById('aiStatus');
+  const pre    = document.getElementById('aiResponse');
+  status.textContent = '⏳ Querying IBM Granite...';
+  pre.style.display  = 'none';
+  try {
+    const t0 = Date.now();
+    const r  = await fetch(BASE + '/api/ai/query', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN },
+      body: JSON.stringify({ question:'Summarize the current pollution status in Vapi industrial zone in 2 sentences.' })
+    });
+    const d  = await r.json();
+    const ms = Date.now() - t0;
+    status.innerHTML = `<span style="color:var(--green)">✓ Response in ${ms}ms</span>`;
+    pre.textContent  = d.answer || d.summary || JSON.stringify(d, null, 2);
+    pre.style.display = 'block';
+    addLog('POST', '/api/ai/query', r.status, ms);
+  } catch (e) {
+    status.innerHTML = `<span style="color:var(--red)">✗ ${e.message}</span>`;
+  }
+}
+
+// ── Log ───────────────────────────────────────────────────────────────────────
+function addLog(method, path, code, ms) {
+  const ts  = new Date().toLocaleTimeString();
+  const cls = code === 200 || code === 201 ? 'log-200' : code === 304 ? 'log-304' : 'log-err';
+  logEntries.unshift({ ts, method, path, code, ms, cls });
+  renderLog();
+}
+
+function renderLog() {
+  const box = document.getElementById('requestLog');
+  box.innerHTML = logEntries.slice(0, 30).map(l => `
+    <div class="log-line">
+      <span style="color:var(--muted)">${l.ts}</span>
+      <span class="method ${l.method.toLowerCase()}" style="font-size:9px;padding:1px 5px">${l.method}</span>
+      <span style="color:var(--text);font-family:monospace">${l.path}</span>
+      <span class="${l.cls}" style="font-weight:700">${l.code}</span>
+      <span style="color:var(--muted)">${l.ms}ms</span>
+    </div>`).join('') || '<div style="color:var(--muted);padding:8px">No requests yet.</div>';
+}
+
+function clearLog() { logEntries = []; renderLog(); }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderRoutes();
+checkHealth();
+
+// Auto-login with stored token
+if (TOKEN) {
+  document.getElementById('loginResult').innerHTML = '<span style="color:var(--green)">✓ Using saved token</span>';
+  document.getElementById('tokenVal').textContent = TOKEN;
+  document.getElementById('tokenBox').classList.add('show');
+  setTimeout(() => { loadDbStats(); loadCollTable(); }, 500);
+}
+</script>
+</body>
+</html>

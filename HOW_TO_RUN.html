@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EcoGuard AI – Step by Step Guide</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--green:#2da44e;--blue:#1f6feb;--red:#f85149;--yellow:#d29922;--font:-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6}
+.hero{background:linear-gradient(135deg,#0d2b1d,#0a1f2d);padding:40px 24px;text-align:center;border-bottom:1px solid var(--border)}
+.hero h1{font-size:28px;font-weight:800;color:var(--green);margin-bottom:8px}
+.hero p{color:var(--muted);font-size:14px;max-width:600px;margin:0 auto}
+.container{max-width:900px;margin:0 auto;padding:32px 24px}
+.step{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:24px;overflow:hidden;transition:border-color .2s}
+.step:hover{border-color:var(--green)}
+.step-header{display:flex;align-items:center;gap:16px;padding:18px 22px;cursor:pointer;background:var(--bg2)}
+.step-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0}
+.step-title{flex:1}
+.step-title h3{font-size:16px;font-weight:700;margin-bottom:2px}
+.step-title p{font-size:12px;color:var(--muted)}
+.step-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.step-body{padding:0 22px 22px;display:block}
+.cmd{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:'Courier New',monospace;font-size:13px;color:#79c0ff;margin:10px 0;position:relative;overflow-x:auto}
+.cmd .prompt{color:var(--muted)}
+.copy-btn{position:absolute;right:10px;top:10px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:var(--font)}
+.copy-btn:hover{color:var(--text)}
+.info-box{padding:12px 16px;border-radius:8px;margin:10px 0;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+.info-box.green{background:rgba(45,164,78,.1);border:1px solid rgba(45,164,78,.3);color:#7ee787}
+.info-box.blue{background:rgba(31,111,235,.1);border:1px solid rgba(31,111,235,.3);color:#79c0ff}
+.info-box.yellow{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);color:#e3b341}
+.info-box.red{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:#ff7b72}
+.url-btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;border:none;cursor:pointer;margin:6px 4px}
+.url-btn:hover{opacity:.85}
+.url-btn.green{background:var(--green)}
+.url-btn.yellow{background:var(--yellow)}
+.url-btn.red{background:var(--red)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.mini-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px}
+.mini-card h4{font-size:12px;font-weight:700;margin-bottom:6px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.mini-card p{font-size:12px;color:var(--text)}
+.cred{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin:6px 0;font-family:monospace;font-size:13px}
+.cred-label{color:var(--muted);font-size:11px;min-width:80px}
+.cred-val{color:var(--yellow);flex:1}
+.route-list{list-style:none}
+.route-list li{display:flex;gap:10px;align-items:center;padding:8px 12px;background:var(--bg3);border-radius:6px;margin-bottom:5px;font-size:12px}
+.badge-method{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:monospace}
+.bm-get{background:rgba(45,164,78,.2);color:var(--green)}
+.bm-post{background:rgba(31,111,235,.2);color:var(--blue)}
+.page-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.page-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-size:12px}
+.page-icon{font-size:22px;margin-bottom:4px}
+.page-name{font-weight:600;color:var(--text)}
+.page-url{font-size:10px;color:var(--muted);font-family:monospace}
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+.check-list{list-style:none}
+.check-list li{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.check-list li:last-child{border:none}
+.check-list .ck{font-size:16px}
+.live-btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;margin:4px}
+.live-btn:hover{opacity:.85}
+.live-btn.outline{background:transparent;border:2px solid var(--green);color:var(--green)}
+.live-btn.blue{background:var(--blue)}
+.terminal{background:#000;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:10px 0}
+.terminal-bar{background:var(--bg3);padding:8px 14px;display:flex;align-items:center;gap:8px}
+.t-dot{width:12px;height:12px;border-radius:50%}
+.terminal-body{padding:14px;font-family:'Courier New',monospace;font-size:12px;line-height:1.8}
+.t-green{color:#4ec94e} .t-blue{color:#79c0ff} .t-yellow{color:#e3b341} .t-muted{color:#666} .t-white{color:#eee} .t-red{color:#f85149}
+footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div style="font-size:48px;margin-bottom:12px">🌿</div>
+  <h1>EcoGuard AI – Complete Setup Guide</h1>
+  <p>Step-by-step guide to run the Backend API + Frontend Dashboard<br>IBM Agentic AI Hackathon 2024 · Challenge 9</p>
+</div>
+
+<div class="container">
+
+  <!-- OVERVIEW -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:24px">
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:14px;color:var(--green)">📐 Architecture Overview</h2>
+    <div style="background:var(--bg3);border-radius:8px;padding:16px;text-align:center;font-family:monospace;font-size:12px;line-height:2;color:var(--muted)">
+      <span style="color:var(--blue)">Browser</span> (localhost:3000)
+      &nbsp;→&nbsp; <span style="color:var(--yellow)">React Frontend</span>
+      &nbsp;→&nbsp; <span style="color:var(--green)">Express Backend</span> (localhost:5000)
+      &nbsp;→&nbsp; <span style="color:var(--red)">NeDB Database</span> (backend/data/)
+      &nbsp;→&nbsp; <span style="color:var(--blue)">IBM Granite LLM</span>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="mini-card">
+        <h4>Frontend (React)</h4>
+        <p>Port <strong>3000</strong> · 15 pages · Dark/Light theme · EN/HI/GU languages · Charts · Live data</p>
+      </div>
+      <div class="mini-card">
+        <h4>Backend (Node.js)</h4>
+        <p>Port <strong>5000</strong> · 22 REST APIs · JWT auth · NeDB database · IBM Granite AI integration</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(45,164,78,.2);color:var(--green)">1</div>
+      <div class="step-title">
+        <h3>🗄️ Seed the Database</h3>
+        <p>Create all demo data — industries, sensors, readings, violations, alerts</p>
+      </div>
+      <span class="step-badge" style="background:rgba(45,164,78,.15);color:var(--green)">Run Once</span>
+    </div>
+    <div class="step-body">
+      <div class="info-box blue">
+        <span>ℹ️</span>
+        <span>This creates 10 industries, 40 sensors, 888 sensor readings, 40 violations, 25 alerts, 10 risk assessments, 60 agent activities in the local database.</span>
+      </div>
+
+      <p style="margin-bottom:8px;font-weight:600">Option A — Double-click the batch file:</p>
+      <div style="background:var(--bg3);border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;margin-bottom:14px">
+        <div style="font-size:32px;margin-bottom:6px">📄</div>
+        <div style="font-weight:700;font-size:15px">SEED_DATABASE.bat</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:4px">Double-click this file in Windows Explorer</div>
+      </div>
+
+      <p style="margin-bottom:8px;font-weight:600">Option B — Run in terminal:</p>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="t-dot" style="background:#f85149"></div>
+          <div class="t-dot" style="background:#d29922"></div>
+          <div class="t-dot" style="background:#2da44e"></div>
+          <span style="color:var(--muted);font-size:11px;margin-left:8px">Command Prompt / PowerShell</span>
+        </div>
+        <div class="terminal-body">
+          <div class="t-muted"># Navigate to project folder</div>
+          <div class="t-blue">cd backend</div>
+          <div class="t-blue">node scripts/seed.js</div>
+          <br>
+          <div class="t-muted"># Expected output:</div>
+          <div class="t-yellow">╔════════════════════════════════════════════╗</div>
+          <div class="t-yellow">║  EcoGuard AI – Database Seeder             ║</div>
+          <div class="t-yellow">╚════════════════════════════════════════════╝</div>
+          <div class="t-green">🧹 Old .db files deleted (fresh start)</div>
+          <div class="t-green">👤 Seeding users...</div>
+          <div class="t-green">   ✓ Admin: admin@ecoguard.ai / Admin@123</div>
+          <div class="t-green">🏭 Seeding industries... ✓ 10 industries</div>
+          <div class="t-green">📡 Seeding sensors...   ✓ 40 sensors</div>
+          <div class="t-green">📊 Seeding readings...  ✓ 888 readings</div>
+          <div class="t-green">⚠️  Seeding violations.. ✓ 40 violations</div>
+          <div class="t-green">✅ Database seeded successfully!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(31,111,235,.2);color:var(--blue)">2</div>
+      <div class="step-title">
+        <h3>⚙️ Start the Backend Server</h3>
+        <p>Node.js Express API on port 5000</p>
+      </div>
+      <span class="step-badge" style="background:rgba(31,111,235,.15);color:var(--blue)">Terminal 1</span>
+    </div>
+    <div class="step-body">
+      <p style="margin-bottom:8px;font-weight:600">Option A — Double-click:</p>
+      <div style="background:var(--bg3);border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;margin-bottom:14px">
+        <div style="font-size:32px;margin-bottom:6px">📄</div>
+        <div style="font-weight:700;font-size:15px">START_BACKEND.bat</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:4px">Double-click — a new terminal window opens</div>
+      </div>
+
+      <p style="margin-bottom:8px;font-weight:600">Option B — Terminal:</p>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="t-dot" style="background:#f85149"></div>
+          <div class="t-dot" style="background:#d29922"></div>
+          <div class="t-dot" style="background:#2da44e"></div>
+          <span style="color:var(--muted);font-size:11px;margin-left:8px">Terminal 1 — Keep this open!</span>
+        </div>
+        <div class="terminal-body">
+          <div class="t-blue">cd backend</div>
+          <div class="t-blue">node server.js</div>
+          <br>
+          <div class="t-muted"># Expected output:</div>
+          <div class="t-yellow">╔══════════════════════════════════════════════════╗</div>
+          <div class="t-yellow">║     EcoGuard AI – Pollution Monitoring System    ║</div>
+          <div class="t-yellow">╠══════════════════════════════════════════════════╣</div>
+          <div class="t-green">║  Backend running on http://localhost:5000         ║</div>
+          <div class="t-blue">║  WatsonX Mode : live                             ║</div>
+          <div class="t-yellow">╚══════════════════════════════════════════════════╝</div>
+          <div class="t-muted"># Server is now ready. DO NOT close this window.</div>
+        </div>
+      </div>
+
+      <div class="info-box green" style="margin-top:12px">
+        <span>✅</span>
+        <span>Test it: Open <strong><a href="http://localhost:5000/api/health" target="_blank" style="color:var(--green)">http://localhost:5000/api/health</a></strong> in your browser. You should see <code style="background:var(--bg3);padding:1px 6px;border-radius:3px">{"status":"OK"}</code></span>
+      </div>
+
+      <div style="margin-top:12px">
+        <a href="http://localhost:5000/api/health" target="_blank" class="url-btn green">🟢 Test Health Check</a>
+        <a href="BACKEND_DASHBOARD.html" target="_blank" class="url-btn">🖥️ Open Backend Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(210,153,34,.2);color:var(--yellow)">3</div>
+      <div class="step-title">
+        <h3>🌐 Start the Frontend</h3>
+        <p>React dashboard on port 3000</p>
+      </div>
+      <span class="step-badge" style="background:rgba(210,153,34,.15);color:var(--yellow)">Terminal 2</span>
+    </div>
+    <div class="step-body">
+      <div class="info-box yellow">
+        <span>⚠️</span>
+        <span>Make sure the <strong>Backend (Step 2)</strong> is running first, then start the frontend in a SEPARATE terminal.</span>
+      </div>
+
+      <p style="margin-bottom:8px;margin-top:10px;font-weight:600">Option A — Double-click:</p>
+      <div style="background:var(--bg3);border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;margin-bottom:14px">
+        <div style="font-size:32px;margin-bottom:6px">📄</div>
+        <div style="font-weight:700;font-size:15px">START_FRONTEND.bat</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:4px">Double-click — a new terminal window opens</div>
+      </div>
+
+      <p style="margin-bottom:8px;font-weight:600">Option B — Terminal:</p>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="t-dot" style="background:#f85149"></div>
+          <div class="t-dot" style="background:#d29922"></div>
+          <div class="t-dot" style="background:#2da44e"></div>
+          <span style="color:var(--muted);font-size:11px;margin-left:8px">Terminal 2 — Keep this open!</span>
+        </div>
+        <div class="terminal-body">
+          <div class="t-blue">cd frontend</div>
+          <div class="t-blue">npm start</div>
+          <br>
+          <div class="t-muted"># Compiling... (wait 30-60 seconds first time)</div>
+          <div class="t-green">Compiled successfully!</div>
+          <div class="t-green">You can now view the app in the browser.</div>
+          <div class="t-white">  Local:   <span class="t-blue">http://localhost:3000</span></div>
+          <div class="t-muted"># Browser opens automatically</div>
+        </div>
+      </div>
+
+      <div class="info-box green" style="margin-top:12px">
+        <span>✅</span>
+        <span>After ~30 seconds the browser opens at <strong><a href="http://localhost:3000" target="_blank" style="color:var(--green)">http://localhost:3000</a></strong> showing the login page.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(248,81,73,.2);color:var(--red)">4</div>
+      <div class="step-title">
+        <h3>🔐 Login to the Dashboard</h3>
+        <p>Use the demo admin credentials</p>
+      </div>
+      <span class="step-badge" style="background:rgba(248,81,73,.15);color:var(--red)">Browser</span>
+    </div>
+    <div class="step-body">
+      <a href="http://localhost:3000/login" target="_blank" class="url-btn" style="margin-bottom:14px;display:inline-flex">
+        🌐 Open Login Page → http://localhost:3000
+      </a>
+
+      <div class="grid2">
+        <div class="mini-card">
+          <h4>👑 Admin Account</h4>
+          <div class="cred"><span class="cred-label">Email</span><span class="cred-val">admin@ecoguard.ai</span></div>
+          <div class="cred"><span class="cred-label">Password</span><span class="cred-val">Admin@123</span></div>
+          <div style="margin-top:8px;font-size:11px;color:var(--green)">✓ Full access to all pages</div>
+        </div>
+        <div class="mini-card">
+          <h4>🔍 Inspector Account</h4>
+          <div class="cred"><span class="cred-label">Email</span><span class="cred-val">inspector@gpcb.gov.in</span></div>
+          <div class="cred"><span class="cred-label">Password</span><span class="cred-val">Viewer@123</span></div>
+          <div style="margin-top:8px;font-size:11px;color:var(--blue)">📋 GPCB read-only access</div>
+        </div>
+      </div>
+
+      <div class="info-box red" style="margin-top:10px">
+        <span>🚫</span>
+        <span>If you see <strong>"Login failed"</strong> — the backend is not running. Go back to Step 2 and start the backend first.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 — All Pages -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(45,164,78,.2);color:var(--green)">5</div>
+      <div class="step-title">
+        <h3>📱 All Dashboard Pages</h3>
+        <p>15 pages available after login</p>
+      </div>
+      <span class="step-badge" style="background:rgba(45,164,78,.15);color:var(--green)">Frontend</span>
+    </div>
+    <div class="step-body">
+      <div class="page-grid">
+        <div class="page-item"><div class="page-icon">🏠</div><div class="page-name">Dashboard</div><div class="page-url">localhost:3000/</div></div>
+        <div class="page-item"><div class="page-icon">📡</div><div class="page-name">Live Monitoring</div><div class="page-url">localhost:3000/live</div></div>
+        <div class="page-item"><div class="page-icon">🌬️</div><div class="page-name">Air Quality</div><div class="page-url">localhost:3000/air</div></div>
+        <div class="page-item"><div class="page-icon">💧</div><div class="page-name">Water Quality</div><div class="page-url">localhost:3000/water</div></div>
+        <div class="page-item"><div class="page-icon">🏭</div><div class="page-name">Industries</div><div class="page-url">localhost:3000/industries</div></div>
+        <div class="page-item"><div class="page-icon">📟</div><div class="page-name">Sensors</div><div class="page-url">localhost:3000/sensors</div></div>
+        <div class="page-item"><div class="page-icon">⚠️</div><div class="page-name">Violations</div><div class="page-url">localhost:3000/violations</div></div>
+        <div class="page-item"><div class="page-icon">🚨</div><div class="page-name">Alerts</div><div class="page-url">localhost:3000/alerts</div></div>
+        <div class="page-item"><div class="page-icon">🏥</div><div class="page-name">Health Risk</div><div class="page-url">localhost:3000/health</div></div>
+        <div class="page-item"><div class="page-icon">🗺️</div><div class="page-name">Pollution Map</div><div class="page-url">localhost:3000/map</div></div>
+        <div class="page-item"><div class="page-icon">📈</div><div class="page-name">Analytics</div><div class="page-url">localhost:3000/analytics</div></div>
+        <div class="page-item"><div class="page-icon">🤖</div><div class="page-name">AI Reports</div><div class="page-url">localhost:3000/reports</div></div>
+        <div class="page-item"><div class="page-icon">⚙️</div><div class="page-name">Agent Monitor</div><div class="page-url">localhost:3000/agents</div></div>
+        <div class="page-item"><div class="page-icon">🔧</div><div class="page-name">Settings</div><div class="page-url">localhost:3000/settings</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 — Backend API -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(31,111,235,.2);color:var(--blue)">6</div>
+      <div class="step-title">
+        <h3>🛣️ Test Backend API Directly</h3>
+        <p>All REST endpoints — test in browser or BACKEND_DASHBOARD.html</p>
+      </div>
+      <span class="step-badge" style="background:rgba(31,111,235,.15);color:var(--blue)">API</span>
+    </div>
+    <div class="step-body">
+      <div style="margin-bottom:12px">
+        <a href="BACKEND_DASHBOARD.html" target="_blank" class="url-btn blue">🖥️ Open Backend Dashboard</a>
+        <a href="http://localhost:5000/api/health" target="_blank" class="url-btn green">💚 Health Check</a>
+      </div>
+
+      <p style="margin-bottom:10px;font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px">Open these URLs directly in browser (GET requests):</p>
+      <ul class="route-list">
+        <li><span class="badge-method bm-get">GET</span><code style="font-size:12px;flex:1"><a href="http://localhost:5000/api/health" target="_blank" style="color:var(--blue)">http://localhost:5000/api/health</a></code><span style="color:var(--muted);font-size:11px">Server status</span></li>
+        <li><span class="badge-method bm-post">POST</span><code style="font-size:12px;flex:1">http://localhost:5000/api/auth/login</code><span style="color:var(--muted);font-size:11px">Login → JWT token</span></li>
+        <li><span class="badge-method bm-get">GET</span><code style="font-size:12px;flex:1">http://localhost:5000/api/dashboard/stats</code><span style="color:var(--muted);font-size:11px">KPI counts 🔐</span></li>
+        <li><span class="badge-method bm-get">GET</span><code style="font-size:12px;flex:1">http://localhost:5000/api/industries</code><span style="color:var(--muted);font-size:11px">All industries 🔐</span></li>
+        <li><span class="badge-method bm-get">GET</span><code style="font-size:12px;flex:1">http://localhost:5000/api/sensors</code><span style="color:var(--muted);font-size:11px">All sensors 🔐</span></li>
+        <li><span class="badge-method bm-get">GET</span><code style="font-size:12px;flex:1">http://localhost:5000/api/violations</code><span style="color:var(--muted);font-size:11px">All violations 🔐</span></li>
+        <li><span class="badge-method bm-get">GET</span><code style="font-size:12px;flex:1">http://localhost:5000/api/alerts</code><span style="color:var(--muted);font-size:11px">All alerts 🔐</span></li>
+        <li><span class="badge-method bm-get">GET</span><code style="font-size:12px;flex:1">http://localhost:5000/api/agents</code><span style="color:var(--muted);font-size:11px">AI agent status 🔐</span></li>
+        <li><span class="badge-method bm-get">GET</span><code style="font-size:12px;flex:1">http://localhost:5000/api/readings/live?type=air</code><span style="color:var(--muted);font-size:11px">Live air reading 🔐</span></li>
+        <li><span class="badge-method bm-post">POST</span><code style="font-size:12px;flex:1">http://localhost:5000/api/ai/query</code><span style="color:var(--muted);font-size:11px">Ask IBM Granite AI 🔐</span></li>
+      </ul>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">🔐 = Requires Authorization: Bearer &lt;token&gt; header. Use the Backend Dashboard to test these easily.</div>
+    </div>
+  </div>
+
+  <!-- STEP 7 — One Click -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(45,164,78,.2);color:var(--green)">7</div>
+      <div class="step-title">
+        <h3>🚀 One-Click Start Everything</h3>
+        <p>Seeds DB + starts backend + starts frontend automatically</p>
+      </div>
+      <span class="step-badge" style="background:rgba(45,164,78,.15);color:var(--green)">Easiest</span>
+    </div>
+    <div class="step-body">
+      <div style="background:var(--bg3);border:2px solid var(--green);border-radius:10px;padding:20px;text-align:center;margin-bottom:16px">
+        <div style="font-size:48px;margin-bottom:8px">📄</div>
+        <div style="font-size:20px;font-weight:800;color:var(--green)">START_ECOGUARD.bat</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:6px">Double-click this ONE file → does everything automatically</div>
+        <div style="margin-top:14px;font-size:12px;color:var(--text)">
+          Seeds database → Starts backend → Waits → Starts frontend → Opens browser
+        </div>
+      </div>
+      <div class="info-box green">
+        <span>✅</span>
+        <span><strong>After ~60 seconds</strong>, open <a href="http://localhost:3000" target="_blank" style="color:var(--green)">http://localhost:3000</a> and login with <strong>admin@ecoguard.ai / Admin@123</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Reference -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:24px">
+    <h2 style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--yellow)">⚡ Quick Reference</h2>
+    <div class="grid2">
+      <div>
+        <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">URLs</p>
+        <ul class="check-list">
+          <li><span class="ck">🌐</span><div><strong>Frontend Dashboard</strong><br><a href="http://localhost:3000" target="_blank" style="color:var(--blue);font-size:12px">http://localhost:3000</a></div></li>
+          <li><span class="ck">⚙️</span><div><strong>Backend API</strong><br><a href="http://localhost:5000/api/health" target="_blank" style="color:var(--blue);font-size:12px">http://localhost:5000/api/health</a></div></li>
+          <li><span class="ck">🖥️</span><div><strong>Backend Dashboard</strong><br><span style="color:var(--blue);font-size:12px">BACKEND_DASHBOARD.html</span></div></li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Login Credentials</p>
+        <ul class="check-list">
+          <li><span class="ck">👑</span><div><strong>Admin</strong><br><span style="font-family:monospace;font-size:12px;color:var(--yellow)">admin@ecoguard.ai / Admin@123</span></div></li>
+          <li><span class="ck">🔍</span><div><strong>Inspector</strong><br><span style="font-family:monospace;font-size:12px;color:var(--yellow)">inspector@gpcb.gov.in / Viewer@123</span></div></li>
+        </ul>
+        <p style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 8px">Features</p>
+        <ul class="check-list">
+          <li><span class="ck">🎨</span>Click <strong>☀️/🌙</strong> in header to toggle Dark/Light mode</li>
+          <li><span class="ck">🌍</span>Click <strong>🇬🇧/🇮🇳</strong> dropdown to switch EN/हि/ગુ</li>
+          <li><span class="ck">📡</span>Live Monitoring auto-refreshes every <strong>5 seconds</strong></li>
+          <li><span class="ck">🤖</span>Click <strong>"AI Analysis"</strong> on any page for IBM Granite response</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Troubleshooting -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:24px">
+    <h2 style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--red)">🔧 Troubleshooting</h2>
+    <ul class="check-list">
+      <li><span class="ck">❌</span><div><strong>"Login failed. Check credentials."</strong><br><span style="color:var(--muted);font-size:12px">→ Backend is not running. Open START_BACKEND.bat first, wait 3 seconds, then try login.</span></div></li>
+      <li><span class="ck">❌</span><div><strong>Backend crashes with "unique constraint" error</strong><br><span style="color:var(--muted);font-size:12px">→ Run SEED_DATABASE.bat to clean and re-seed. This deletes old corrupted data.</span></div></li>
+      <li><span class="ck">❌</span><div><strong>Frontend shows blank white page</strong><br><span style="color:var(--muted);font-size:12px">→ Wait 30 seconds for React to compile. Check the frontend terminal for "Compiled successfully".</span></div></li>
+      <li><span class="ck">❌</span><div><strong>Port already in use</strong><br><span style="color:var(--muted);font-size:12px">→ Run: <code style="background:var(--bg3);padding:1px 6px;border-radius:3px;font-size:11px">taskkill /f /im node.exe</code> then restart.</span></div></li>
+      <li><span class="ck">❌</span><div><strong>WatsonX 404 error (AI returns mock)</strong><br><span style="color:var(--muted);font-size:12px">→ Normal! IBM WatsonX Orchestrate URL doesn't support text generation. AI falls back to intelligent mock responses automatically.</span></div></li>
+    </ul>
+  </div>
+
+  <!-- Quick Launch -->
+  <div style="text-align:center;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px">
+    <h2 style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--green)">🚀 Launch Now</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Backend is already running · Click to open</p>
+    <div>
+      <a href="http://localhost:3000" target="_blank" class="live-btn">🌐 Open Dashboard (Port 3000)</a>
+      <a href="http://localhost:5000/api/health" target="_blank" class="live-btn blue">⚙️ API Health (Port 5000)</a>
+      <a href="BACKEND_DASHBOARD.html" target="_blank" class="live-btn outline">🖥️ Backend Explorer</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  EcoGuard AI · IBM Agentic AI Hackathon 2024 · Challenge 9 · Smart Industrial Pollution Monitoring · Vapi–Ankleshwar–Vatva Corridor
+</footer>
+
+</body>
+</html>
